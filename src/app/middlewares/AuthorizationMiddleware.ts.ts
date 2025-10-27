@@ -17,11 +17,15 @@ export class AuthorizationMiddleware implements IMiddleware {
       };
     }
 
-    const permissions = await this.getRolePermissionsUseCase.execute({
+    const { permissionsCode } = await this.getRolePermissionsUseCase.execute({
       roleId: account.role,
     });
 
-    if (!this.requiredPermissions.includes(account.role)) {
+    const isAllowed = this.requiredPermissions.some((code) =>
+      permissionsCode.includes(code),
+    );
+
+    if (!isAllowed) {
       return {
         statusCode: 403,
         body: {
